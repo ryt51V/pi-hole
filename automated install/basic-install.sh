@@ -112,7 +112,8 @@ welcomeDialogs() {
 
 	# Explain the need for a static address
 	whiptail --msgbox --backtitle "Initating network interface" --title "Static IP Needed" "The Pi-hole is a SERVER so it needs a STATIC IP ADDRESS to function properly.	
-	In the next section, you can choose to use your current network settings (DHCP) or to manually edit them." $r $c
+	In the next section you can choose to use your current (DHCP) network settings as static settings, or to manually edit them.
+	If you have already set a static IP address then you can also keep your settings as is." $r $c
 }
 
 
@@ -151,7 +152,7 @@ chooseInterface() {
 
 	# Find out how many interfaces are available to choose from
 	interfaceCount=$(echo "$availableInterfaces" | wc -l)
-	chooseInterfaceCmd=(whiptail --separate-output --radiolist "Choose An Interface" $r $c $interfaceCount)
+	chooseInterfaceCmd=(whiptail --separate-output --radiolist "Choose An Interface.\n\n(If you are unsure, choose 'eth0' for your main wired connection.)" $r $c $interfaceCount)
 	chooseInterfaceOptions=$("${chooseInterfaceCmd[@]}" "${interfacesArray[@]}" 2>&1 >/dev/tty)
 	if [[ $? = 0 ]];then
 		for desiredInterface in $chooseInterfaceOptions
@@ -176,7 +177,7 @@ cleanupIPv6() {
 
 use4andor6() {
 	# Let use select IPv4 and/or IPv6
-	cmd=(whiptail --separate-output --checklist "Select Protocols" $r $c 2)
+	cmd=(whiptail --separate-output --checklist "Select Protocols\n\n(If you are unsure, leave these as the defaults.)" $r $c 2)
 	options=(IPv4 "Block ads over IPv4" on
 	IPv6 "Block ads over IPv6" off)
 	choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)

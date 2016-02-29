@@ -24,7 +24,7 @@ instalLogLoc=/etc/pihole/install.log
 
 webInterfaceGitUrl="https://github.com/pi-hole/AdminLTE.git"
 
-piholeGitUrl="https://github.com/pi-hole/pi-hole.git"
+piholeGitUrl="https://github.com/ryt51V/pi-hole"
 piholeFilesDir="/etc/.pihole"
 
 

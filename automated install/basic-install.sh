@@ -54,8 +54,10 @@ piholeFilesDir="/etc/.pihole"
 rows=$(tput lines)
 columns=$(tput cols)
 
+# rows to 0 to auto size
+# columns to just under window size
 r=$(( rows * 2 / 3 ))
-c=$(( columns * 2 / 3 ))
+c=$(( columns - 4 ))
 
 piholeINTfile=/etc/pihole/piholeINT
 piholeIPfile=/etc/pihole/piholeIP

@@ -120,9 +120,7 @@ welcomeDialogs() {
 	whiptail --msgbox --backtitle "Plea" --title "Free and open source" "The Pi-hole is free, but powered by your donations:  http://pi-hole.net/donate" $r $c
 
 	# Explain the need for a static address
-	whiptail --msgbox --backtitle "Initating network interface" --title "Static IP Needed" "The Pi-hole is a SERVER so it needs a STATIC IP ADDRESS to function properly.	
-	In the next section you can choose to use your current (DHCP) network settings as static settings, or to manually edit them.
-	If you have already set a static IP address then you can also keep your settings as is." $r $c
+	whiptail --msgbox --backtitle "Initating network interface" --title "Static IP Needed" "The Pi-hole is a SERVER so it needs a STATIC IP ADDRESS to function properly.\n\nIn the next section you can choose to use your current (DHCP) network settings as static settings, or to manually edit them. If you have already set a static IP address then you can also keep your settings as is.\n\nIf you wish to run another web site alongside Pi-hole, then you should also set a *SECOND* static IP address dedicated for the Pi-hole's web server.  You will need to set this up manually before running this installer." $r $c
 }
 
 
@@ -378,8 +376,6 @@ function chooseWebServer() {
 					exit 1
 				fi
 			fi
-			
-			whiptail --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "apache" --yesno "If you are running other web servers, it is strongly recommended to run the pihole on its own IP address." $r $c
 			
 			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
 			;;

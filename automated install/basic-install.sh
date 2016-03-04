@@ -353,7 +353,7 @@ setStaticIPv4() {
 
 function chooseWebServer() {
 	# Allow the user to choose the web server they wish to use.
-	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole can automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c 2)
+	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole can automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c)
 	chooseWebServerOptions=(lighttpd "Please automatically install and configure lighttpd." on
 							apache "I have already installed apache2. Please install the pi-hole vhost." off
 							Manual "I have already installed a webserver. Please just install the webroot files." off)
@@ -373,14 +373,14 @@ function chooseWebServer() {
 			if [[ $(dpkg-query -s apache2) ]]; then
 				:
 			else
-				whiptail --yesno --defaultno --backtitle "apache" --title "WARNING\n\napache2 does not appear to be installed.  You must have already installed it before using this option.  \n\nAre you sure you wish to continue?" $r $c
+				whiptail --defaultno --backtitle "apache" --title "apache" --yesno "WARNING\n\napache2 does not appear to be installed.  You must have already installed it before using this option.  \n\nAre you sure you wish to continue?" $r $c
 				if [[ $? != 0 ]]; then
 					echo "::: Cancel selected, exiting...."
 					exit 1
 				fi
 			fi
 			
-			whiptail --yesno --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "If you are running other web servers, it is strongly recommended to. run the pihole on its own IP address." $r $c
+			whiptail --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "apache" --yesno "If you are running other web servers, it is strongly recommended to. run the pihole on its own IP address." $r $c
 			
 			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
 			;;

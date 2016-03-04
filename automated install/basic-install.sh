@@ -56,7 +56,7 @@ columns=$(tput cols)
 
 # rows to 0 to auto size
 # columns to just under window size
-r=$(( rows * 2 / 3 ))
+r=0
 c=$(( columns - 4 ))
 
 piholeINTfile=/etc/pihole/piholeINT

@@ -8,5 +8,5 @@ So far includes:
 - **dnsports**: Allows specifying a custom port for a custom DNS server.
 - **networkchoices**: Work properly with interfaces with multiple IPv4 addresses.  Allow the user to keep their current network reconfiguration.
 - **Feature/ryt51V-sudo**: Better handling of sudo and the pihole user.
-- **improveddialog**: Just what the dialog should be IMO.
+- **ryt51V-improveddialog**: Just what the dialog should be IMO.
 

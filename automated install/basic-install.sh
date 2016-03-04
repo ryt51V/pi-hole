@@ -54,9 +54,8 @@ piholeFilesDir="/etc/.pihole"
 rows=$(tput lines)
 columns=$(tput cols)
 
-# Divide by two so the dialogs take up half of the screen, which looks nice.
-r=$(( rows / 2 ))
-c=$(( columns / 2 ))
+r=$(( rows * 2 / 3 ))
+c=$(( columns * 2 / 3 ))
 
 piholeINTfile=/etc/pihole/piholeINT
 piholeIPfile=/etc/pihole/piholeIP
@@ -353,7 +352,7 @@ setStaticIPv4() {
 
 function chooseWebServer() {
 	# Allow the user to choose the web server they wish to use.
-	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole can automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c)
+	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole can automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c 3)
 	chooseWebServerOptions=(lighttpd "Please automatically install and configure lighttpd." on
 							apache "I have already installed apache2. Please install the pi-hole vhost." off
 							Manual "I have already installed a webserver. Please just install the webroot files." off)

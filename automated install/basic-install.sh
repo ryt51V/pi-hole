@@ -54,10 +54,9 @@ piholeFilesDir="/etc/.pihole"
 rows=$(tput lines)
 columns=$(tput cols)
 
-# rows to 0 to auto size
-# columns to just under window size
+# Set whiptail to autosize.  Doesn't always look as nice but means it will always fit.
 r=0
-c=$(( columns - 4 ))
+c=0
 
 piholeINTfile=/etc/pihole/piholeINT
 piholeIPfile=/etc/pihole/piholeIP

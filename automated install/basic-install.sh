@@ -607,8 +607,9 @@ installConfigs() {
 		apache)
 			apachevhost='/etc/apache2/sites-available/pihole-vhost.conf'
 			cp /etc/.pihole/advanced/apache/pihole-vhost.conf "$apachevhost"
-			sed -i "s/@IPv4addr@/${IPv4addr%/*}/" "$apachevhost"
-			sed -i "s/@webRoot@/$webRoot/" "$apachevhost"
+			# sed separated by a character least likely to appear in the strings
+			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "$apachevhost"
+			sed -i "s#@webRoot@#$webRoot#" "$apachevhost"
 			;;
 		Manual)
 			:

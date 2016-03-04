@@ -605,8 +605,8 @@ installConfigs() {
 			cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
 			;;
 		apache)
-			apachevhost='/etc/apache2/sites-available/pihole-vhost.conf'
-			cp /etc/.pihole/advanced/apache/pihole-vhost.conf "$apachevhost"
+			apachevhost='/etc/apache2/sites-available/pihole.conf'
+			cp /etc/.pihole/advanced/apache/pihole.conf "$apachevhost"
 			# sed separated by a character least likely to appear in the strings
 			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "$apachevhost"
 			sed -i "s#@webRoot@#$webRoot#" "$apachevhost"
@@ -785,7 +785,7 @@ installPiholeWeb() {
 		apache)
 			echo "::: Enabling apache site"
 			a2enmod headers rewrite
-			a2ensite pihole-vhost
+			a2ensite pihole
 			;;
 		Manual)
 			:

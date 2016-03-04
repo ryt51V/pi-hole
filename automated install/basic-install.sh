@@ -203,8 +203,8 @@ use4andor6() {
 			
 			# Get interface address information
 			IPv4dev=$piholeInterface
-			IPv4addresses=$($SUDO ip -o -f inet addr show dev $IPv4dev | awk '{print $4}')
-			IPv4gw=$($SUDO ip route show dev "$IPv4dev" | awk '/default/ {print $3}')
+			IPv4addresses=$(ip -o -f inet addr show dev $IPv4dev | awk '{print $4}')
+			IPv4gw=$(ip route show dev "$IPv4dev" | awk '/default/ {print $3}')
 			
 			# Turn IPv4 addresses into an array so it can be used with a whiptail dialog
 			IPv4Array=()
@@ -353,9 +353,10 @@ setStaticIPv4() {
 
 function chooseWebServer() {
 	# Allow the user to choose the web server they wish to use.
-	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole will automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c 2)
-	chooseWebServerOptions=(lighttpd "" on
-							Manual "" off)
+	chooseWebServerCmd=(whiptail --separate-output --radiolist "Pi-hole can automatically configure the lighttpd web server for you.\n\nAlternatively, if you prefer, pi-hole can use a web server that you have previously manually configured yourself.\n\n(If you are unsure, choose lighttpd.)" $r $c 2)
+	chooseWebServerOptions=(lighttpd "Please automatically install and configure lighttpd." on
+							apache "I have already installed apache2. Please install the pi-hole vhost." off
+							Manual "I have already installed a webserver. Please just install the webroot files." off)
 	webServer=$("${chooseWebServerCmd[@]}" "${chooseWebServerOptions[@]}" 2>&1 >/dev/tty)
 	if [[ ! ($? = 0) ]]; then
 		echo "::: Cancel selected, exiting...."
@@ -365,6 +366,20 @@ function chooseWebServer() {
 		lighttpd)
 			echo "::: Using lighttpd web server."
 			webRoot="/var/www/html"
+			;;
+		apache)
+			echo "::: Using apache web server."
+			# Check we actually have apache installed.
+			if [[ $(dpkg-query -s apache2) ]]; then
+				:
+			else
+				whiptail --yesno --defaultno --backtitle "apache" --title "WARNING\n\napache2 does not appear to be installed.  You must have already installed it before using this option.  \n\nAre you sure you wish to continue?" $r $c
+				if [[ $? != 0 ]]; then
+					echo "::: Cancel selected, exiting...."
+					exit 1
+				fi
+			fi
+			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
 			;;
 		Manual)
 			echo "::: Using manual web server configuration."
@@ -581,11 +596,23 @@ installConfigs() {
 	echo ":::"
 	echo "::: Installing configs..."
 	versionCheckDNSmasq
-	if [[ "$webServer" = "lighttpd" ]]
-	then
-		mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.orig
-		cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
-	fi
+	
+	case $webServer in
+		lighttpd)
+			mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.orig
+			cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
+			;;
+		apache)
+			apachevhost='/etc/apache2/sites-available/01-pihole.conf'
+			cp /etc/.pihole/advanced/apache/01-pihole.conf "$apachevhost"
+			sed -i "s/@IPv4addr@/${IPv4addr%/*}/" "$apachevhost"
+			sed -i "s/@webRoot@/$webRoot/" "$apachevhost"
+			;;
+		Manual)
+			:
+			;;
+	esac
+	
 }
 
 stopServices() {
@@ -636,11 +663,20 @@ checkForDependencies() {
     echo "::: Checking dependencies:"
 
 	dependencies=( dnsutils bc toilet figlet dnsmasq php5-common php5-cgi php5 git curl unzip wget )
-	# Add lighttpd to the list if required.
-	if [[ "$webServer" = "lighttpd" ]]
-	then
-		dependencies=( "${dependencies[@]}" "lighttpd" )
-	fi
+	
+	# Add web server specific dependencies
+	case $webServer in
+		lighttpd)
+			dependencies=( "${dependencies[@]}" "lighttpd" )
+			;;
+		apache)
+			dependencies=( "${dependencies[@]}" "libapache2-mod-php5" )
+			;;
+		Manual)
+			:
+			;;
+	esac
+	
 	for i in "${dependencies[@]}"
 	do
 	:
@@ -724,10 +760,18 @@ installPiholeWeb() {
 		echo " Existing page detected, not overwriting"
 	else
 		mkdir "${webRoot}/pihole"
-		if [[ "$webServer" = "lighttpd" ]]
-		then
-			mv "${webRoot}/index.lighttpd.html" "${webRoot}/index.lighttpd.orig"
-		fi
+		case $webServer in
+			lighttpd)
+				mv "${webRoot}/index.lighttpd.html" "${webRoot}/index.lighttpd.orig"
+				;;
+			apache)
+				a2enmod headers rewrite
+				a2ensite 001-pihole
+				;;
+			Manual)
+				:
+				;;
+		esac
 		cp /etc/.pihole/advanced/index.html "${webRoot}/pihole/index.html"
 		echo " done!"
 	fi
@@ -865,10 +909,19 @@ displayFinalMessage
 echo -n "::: Restarting services..."
 # Start services
 service dnsmasq restart
-if [[ "$webServer" = "lighttpd" ]]
-then
-	service lighttpd start
-fi
+
+case $webServer in
+	lighttpd)
+		service lighttpd start
+		;;
+	apache)
+		service apache2 restart
+		;;
+	Manual)
+		:
+		;;
+esac
+
 echo " done."
 
 echo ":::"

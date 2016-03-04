@@ -6,10 +6,11 @@ Branches beginning "alt/" are largely internal to the fork.  Other branches are 
 
 ## Branches
 
-- **webserverchoices**: Allows choosing manual web server configuration (for use with a web server you have brought up yourself).
 - **dnsports**: Allows specifying a custom port for a custom DNS server.
-- **networkchoices**: Work properly with interfaces with multiple IPv4 addresses.  Allow the user to keep their current network reconfiguration.
 - **Feature/ryt51V-sudo**: Better handling of sudo and the pihole user.
+- **networkchoices**: Work properly with interfaces with multiple IPv4 addresses.  Allow the user to keep their current network reconfiguration.
+- **webserverchoices**: Allows choosing manual web server configuration (for use with a web server you have brought up yourself).
+
 - **alt/improveddialog**: Just what the dialog should be IMO.
 
 ## Unbranched changes in alt/master

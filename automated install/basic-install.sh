@@ -379,7 +379,7 @@ function chooseWebServer() {
 				fi
 			fi
 			
-			whiptail --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "apache" --yesno "If you are running other web servers, it is strongly recommended to. run the pihole on its own IP address." $r $c
+			whiptail --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "apache" --yesno "If you are running other web servers, it is strongly recommended to run the pihole on its own IP address." $r $c
 			
 			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
 			;;

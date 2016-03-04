@@ -379,6 +379,9 @@ function chooseWebServer() {
 					exit 1
 				fi
 			fi
+			
+			whiptail --yesno --yes-button "OK" --no-button "Cancel" --backtitle "apache" --title "If you are running other web servers, it is strongly recommended to. run the pihole on its own IP address." $r $c
+			
 			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
 			;;
 		Manual)
@@ -603,8 +606,8 @@ installConfigs() {
 			cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
 			;;
 		apache)
-			apachevhost='/etc/apache2/sites-available/01-pihole.conf'
-			cp /etc/.pihole/advanced/apache/01-pihole.conf "$apachevhost"
+			apachevhost='/etc/apache2/sites-available/pihole-vhost.conf'
+			cp /etc/.pihole/advanced/apache/pihole-vhost.conf "$apachevhost"
 			sed -i "s/@IPv4addr@/${IPv4addr%/*}/" "$apachevhost"
 			sed -i "s/@webRoot@/$webRoot/" "$apachevhost"
 			;;
@@ -766,7 +769,7 @@ installPiholeWeb() {
 				;;
 			apache)
 				a2enmod headers rewrite
-				a2ensite 001-pihole
+				a2ensite pihole-vhost
 				;;
 			Manual)
 				:

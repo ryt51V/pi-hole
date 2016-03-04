@@ -768,8 +768,7 @@ installPiholeWeb() {
 				mv "${webRoot}/index.lighttpd.html" "${webRoot}/index.lighttpd.orig"
 				;;
 			apache)
-				a2enmod headers rewrite
-				a2ensite pihole-vhost
+				:
 				;;
 			Manual)
 				:
@@ -778,6 +777,21 @@ installPiholeWeb() {
 		cp /etc/.pihole/advanced/index.html "${webRoot}/pihole/index.html"
 		echo " done!"
 	fi
+	
+	case $webServer in
+		lighttpd)
+			:
+			;;
+		apache)
+			echo "::: Enabling apache site"
+			a2enmod headers rewrite
+			a2ensite pihole-vhost
+			;;
+		Manual)
+			:
+			;;
+	esac
+	
 }
 
 installCron() {

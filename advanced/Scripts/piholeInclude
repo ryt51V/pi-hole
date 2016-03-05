@@ -28,6 +28,11 @@ SUDO=""
 piholeconffile="${piholeConfigDir}/pihole.conf"
 source "$piholeconffile"
 
+if [[ $? != 0 ]]; then
+	echo "::: Error loading pihole conf file ${piholeconffile}.  Unable to continue."
+	exit 1
+fi
+
 # Functions to rerun script with sudo
 function rerun_root() {
 	# Check if root, and if not then rerun with sudo.

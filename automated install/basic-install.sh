@@ -893,8 +893,6 @@ welcomeDialogs
 # Verify there is enough disk space for the install
 verifyFreeDiskSpace
 
-# Just back up the original Pi-hole right away since it won't take long and it gets it out of the way
-backupLegacyPihole
 # Find interfaces and let the user choose one
 chooseInterface
 # Let the user decide if they want to block ads over IPv4 and/or IPv6
@@ -906,8 +904,14 @@ chooseWebServer
 # Decide what upstream DNS Servers to use
 setDNS
 
+# Above this line, no permanent changes should have been made.
+# Below this line, permanent changes will be made.
+
 # Make pihole directories
 mkpiholeDir
+
+# Back up the original Pi-hole.
+backupLegacyPihole
 
 # Set the admin page password
 setPassword

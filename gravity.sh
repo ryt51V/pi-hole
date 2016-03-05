@@ -50,21 +50,7 @@ eventHorizon=$basename.2.eventHorizon.txt
 accretionDisc=$basename.3.accretionDisc.txt
 eyeOfTheNeedle=$basename.4.wormhole.txt
 
-spinner(){
-        local pid=$1
-        local delay=0.001
-        local spinstr='/-\|'
 
-        spin='-\|/'
-        i=0
-        while kill -0 $pid 2>/dev/null
-        do
-                i=$(( (i+1) %4 ))
-                printf "\b${spin:$i:1}"
-                sleep .1
-        done
-        printf "\b"
-}
 ###########################
 # collapse - begin formation of pihole
 function gravity_collapse() {

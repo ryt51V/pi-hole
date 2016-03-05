@@ -28,8 +28,8 @@ source /usr/local/include/pihole/piholeInclude
 rerun_pihole "$0" "$@"
 
 #globals
-blacklist=/etc/pihole/blacklist.txt
-adList=/etc/pihole/gravity.list
+blacklist="${piholeConfigDir}/blacklist.txt"
+adList="${piholeConfigDir}/gravity.list"
 reload=true
 addmode=true
 force=false

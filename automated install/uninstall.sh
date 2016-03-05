@@ -32,6 +32,10 @@ else
 	fi
 fi
 
+######## VARIABLES #########
+
+piholeConfigDir=/etc/pihole/
+piholeVarDir=/var/lib/pihole
 
 ######### SCRIPT ###########
 apt-get -y remove --purge dnsutils bc toilet
@@ -80,5 +84,6 @@ rm /usr/local/bin/whitelist.sh
 rm /usr/local/bin/piholeReloadServices.sh
 rm /usr/local/bin/piholeLogFlush.sh
 rm /usr/local/bin/updateDashboard.sh
-rm -rf /etc/pihole/
+rm -rf "${piholeConfigDir}"
+rm -rf "${piholeVarDir}"
 rm -rf /usr/local/include/pihole

@@ -16,7 +16,7 @@ rerun_pihole "$0" "$@"
 
 #Functions##############################################################################################################
 piLog="/var/log/pihole.log"
-gravity="/etc/pihole/gravity.list"
+gravity="${piholeConfigDir}/gravity.list"
 
 today=$(date "+%b %e")
 
@@ -26,10 +26,10 @@ function CalcBlockedDomains(){
 		#Are we IPV6 or IPV4?
 		if [[ -n $piholeIPv6 ]];then
 			#We are IPV6
-			blockedDomainsTotal=$(wc -l /etc/pihole/gravity.list | awk '{print $1/2}')
+			blockedDomainsTotal=$(wc -l "${piholeConfigDir}/gravity.list" | awk '{print $1/2}')
 		else
 			#We are IPV4
-			blockedDomainsTotal=$(wc -l /etc/pihole/gravity.list | awk '{print $1}')
+			blockedDomainsTotal=$(wc -l "${piholeConfigDir}/gravity.list" | awk '{print $1}')
 		fi
 	else
 		blockedDomainsTotal="Err."
@@ -93,7 +93,7 @@ function normalChrono(){
 		uptime -p
 		echo "-------------------------------"
 		# Uncomment to continually read the log file and display the current domain being blocked
-		#tail -f /var/log/pihole.log | awk '/\/etc\/pihole\/gravity.list/ {if ($7 != "address" && $7 != "name" && $7 != "/etc/pihole/gravity.list") print $7; else;}'
+		#tail -f /var/log/pihole.log | awk '/\/etc\/pihole\/gravity.list/ {if ($7 != "address" && $7 != "name" && $7 != "${piholeConfigDir}/gravity.list") print $7; else;}'
 		
 		#uncomment next 4 lines to use original query count calculation
 		#today=$(date "+%b %e")

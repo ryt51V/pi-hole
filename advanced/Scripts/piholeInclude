@@ -10,13 +10,18 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 
+######## VARIABLES #########
+
+piholeConfigDir=/etc/pihole/
+piholeVarDir=/var/lib/pihole
+
 # Older versions of Pi-hole set $SUDO="sudo" and prefixed commands with it,
 # rather than rerunning with sudo. Just in case it turns up by accident, 
 # explicitly set the $SUDO variable to an empty string.
 SUDO=""
 
 # Include the pihole config file
-piholeconffile=/etc/pihole/pihole.conf
+piholeconffile="${piholeConfigDir}/pihole.conf"
 source "$piholeconffile"
 
 # Functions to rerun script with sudo

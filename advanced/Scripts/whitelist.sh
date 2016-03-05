@@ -28,8 +28,8 @@ source /usr/local/include/pihole/piholeInclude
 rerun_pihole "$0" "$@"
 
 #globals
-whitelist=/etc/pihole/whitelist.txt
-adList=/etc/pihole/gravity.list
+whitelist="${piholeConfigDir}/whitelist.txt"
+adList="${piholeConfigDir}/gravity.list"
 reload=true
 addmode=true
 force=false
@@ -131,13 +131,13 @@ function ModifyHostFile(){
         plural=; [[ "$numberOf" != "1" ]] && plural=s
         echo ":::"
         echo -n "::: Modifying HOSTS file to whitelist $numberOf domain${plural}..."
-        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIP $line"; done > /etc/pihole/whitelist.tmp
-        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIPv6 $line"; done >> /etc/pihole/whitelist.tmp
-        echo "l" >> /etc/pihole/whitelist.tmp
-        grep -F -x -v -f /etc/pihole/whitelist.tmp /etc/pihole/gravity.list > /etc/pihole/gravity.tmp        
-        rm /etc/pihole/gravity.list
-        mv /etc/pihole/gravity.tmp /etc/pihole/gravity.list
-        rm /etc/pihole/whitelist.tmp
+        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIP $line"; done > "${piholeConfigDir}/whitelist.tmp"
+        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIPv6 $line"; done >> "${piholeConfigDir}/whitelist.tmp"
+        echo "l" >> "${piholeConfigDir}/whitelist.tmp"
+        grep -F -x -v -f "${piholeConfigDir}/whitelist.tmp" "${piholeConfigDir}/gravity.list" > "${piholeConfigDir}/gravity.tmp     "   
+        rm "${piholeConfigDir}/gravity.list"
+        mv "${piholeConfigDir}/gravity.tmp" "${piholeConfigDir}/gravity.list"
+        rm "${piholeConfigDir}/whitelist.tmp"
         echo " done!"
 	  	  
 	  	fi

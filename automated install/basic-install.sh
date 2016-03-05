@@ -41,8 +41,11 @@ fi
 
 ######## VARIABLES #########
 
+piholeConfigDir=/etc/pihole/
+piholeVarDir=/var/lib/pihole
+
 tmpLog=/tmp/pihole-install.log
-instalLogLoc=/etc/pihole/install.log
+instalLogLoc="${piholeConfigDir}/install.log"
 
 webInterfaceGitUrl="https://github.com/pi-hole/AdminLTE.git"
 
@@ -58,14 +61,14 @@ columns=$(tput cols)
 r=0
 c=0
 
-piholeconffile=/etc/pihole/pihole.conf
+piholeconffile="${piholeConfigDir}/pihole.conf"
 
 availableInterfaces=$(ip -o link | awk '{print $2}' | grep -v "lo" | cut -d':' -f1)
 dhcpcdFile=/etc/dhcpcd.conf
 
 ######## FIRST CHECK ########
 
-if [ -d "/etc/pihole" ]; then
+if [ -d "${piholeConfigDir}" ]; then
 		# Likely an existing install
 		upgrade=true
 	else
@@ -90,9 +93,14 @@ spinner() {
 
 mkpiholeDir() {
 	# Create the pihole config directory with pihole as the group owner with rw permissions.
-	mkdir -p /etc/pihole/
-	chown --recursive root:pihole /etc/pihole
-	chmod --recursive ug=rwX,o=rX /etc/pihole
+	mkdir -p "${piholeConfigDir}"
+	chown --recursive root:pihole "${piholeConfigDir}"
+	chmod --recursive ug=rwX,o=rX "${piholeConfigDir}"
+	
+	# Create the pihole var directory with pihole as the group owner with rw permissions.
+	mkdir -p "${piholeVarDir}"
+	chown --recursive root:pihole "${piholeVarDir}"
+	chmod --recursive ug=rwX,o=rX "${piholeVarDir}"
 }
 
 generateConfig() {
@@ -108,13 +116,13 @@ backupLegacyPihole() {
 	# This function detects and backups the pi-hole v1 files.  It will not do anything to the current version files.
 	if [[ -f /etc/dnsmasq.d/adList.conf ]];then
 		echo "::: Original Pi-hole detected.  Initiating sub space transport"
-		mkdir -p /etc/pihole/original/
-		mv /etc/dnsmasq.d/adList.conf /etc/pihole/original/adList.conf.$(date "+%Y-%m-%d")
-		mv /etc/dnsmasq.conf /etc/pihole/original/dnsmasq.conf.$(date "+%Y-%m-%d")
-		mv /etc/resolv.conf /etc/pihole/original/resolv.conf.$(date "+%Y-%m-%d")
-		mv /etc/lighttpd/lighttpd.conf /etc/pihole/original/lighttpd.conf.$(date "+%Y-%m-%d")
-		mv /var/www/pihole/index.html /etc/pihole/original/index.html.$(date "+%Y-%m-%d")
-		mv /usr/local/bin/gravity.sh /etc/pihole/original/gravity.sh.$(date "+%Y-%m-%d")
+		mkdir -p ${piholeConfigDir}/original/
+		mv /etc/dnsmasq.d/adList.conf "${piholeConfigDir}/original/adList.conf.$(date "+%Y-%m-%d")"
+		mv /etc/dnsmasq.conf "${piholeConfigDir}/original/dnsmasq.conf.$(date "+%Y-%m-%d")"
+		mv /etc/resolv.conf "${piholeConfigDir}/original/resolv.conf.$(date "+%Y-%m-%d")"
+		mv /etc/lighttpd/lighttpd.conf "${piholeConfigDir}/original/lighttpd.conf.$(date "+%Y-%m-%d")"
+		mv /var/www/pihole/index.html "${piholeConfigDir}/original/index.html.$(date "+%Y-%m-%d")"
+		mv /usr/local/bin/gravity.sh "${piholeConfigDir}/original/gravity.sh.$(date "+%Y-%m-%d")"
 	else
 		:
 	fi
@@ -522,7 +530,7 @@ versionCheckDNSmasq(){
   # Check if /etc/dnsmasq.conf is from pihole.  If so replace with an original and install new in .d directory
   dnsFile1="/etc/dnsmasq.conf"
   dnsFile2="/etc/dnsmasq.conf.orig"
-  dnsSearch="addn-hosts=/etc/pihole/gravity.list"
+  dnsSearch="addn-hosts=${piholeConfigDir}/gravity.list"
   
   defaultFile="/etc/.pihole/advanced/dnsmasq.conf.original"
   newFileToInstall="/etc/.pihole/advanced/01-pihole.conf"
@@ -794,9 +802,9 @@ runGravity() {
 	# Rub gravity.sh to build blacklists
 	echo ":::"
 	echo "::: Preparing to run gravity.sh to refresh hosts..."	
-	if ls /etc/pihole/list* 1> /dev/null 2>&1; then
+	if ls "${piholeConfigDir}/list*" 1> /dev/null 2>&1; then
 		echo "::: Cleaning up previous install (preserving whitelist/blacklist)"		
-		rm /etc/pihole/list.*
+		rm "${piholeConfigDir}/list.*"
 	fi
 	#Don't run as SUDO, this was causing issues
 	echo "::: Running gravity.sh"
@@ -832,7 +840,7 @@ setPassword() {
 	
 	if [ $? = 0 ]; then
 		# Entered password
-		echo $pass > /etc/pihole/password.txt
+		echo $pass > "${piholeConfigDir}/password.txt"
 	else
 		echo "::: Cancel selected, exiting...."
 		exit 1
@@ -844,7 +852,7 @@ installPihole() {
 	checkForDependencies # done
 	stopServices
 	setUser
-	mkdir -p /etc/pihole/
+	mkdir -p "${piholeConfigDir}"
 	if [[ ! ( -d "$webRoot") ]]
 	then
 		mkdir -p "${webRoot}/pihole"
@@ -876,12 +884,11 @@ $piholeIPv6
 
 If you set a new IP address, you should restart the Pi.
 
-The install log is in /etc/pihole." $r $c
+The install log is in ${piholeConfigDir}." $r $c
 }
 
 ######## SCRIPT ############
 # Start the installer
-mkpiholeDir
 welcomeDialogs
 
 # Verify there is enough disk space for the install
@@ -900,6 +907,9 @@ chooseWebServer
 # Decide what upstream DNS Servers to use
 setDNS
 
+# Make pihole directories
+mkpiholeDir
+
 # Set the admin page password
 setPassword
 
@@ -909,7 +919,7 @@ generateConfig > "$piholeconffile"
 # Install and log everything to a file
 installPihole | tee $tmpLog
 
-# Move the log file into /etc/pihole for storage
+# Move the log file into ${piholeConfigDir} for storage
 mv $tmpLog $instalLogLoc
 
 displayFinalMessage
@@ -939,5 +949,5 @@ echo ":::     $piholeIPv6"
 echo ":::"
 echo "::: If you set a new IP address, you should restart the Pi."
 echo "::: "
-echo "::: The install log is located at: /etc/pihole/install.log"
+echo "::: The install log is located at: ${piholeConfigDir}/install.log"
 

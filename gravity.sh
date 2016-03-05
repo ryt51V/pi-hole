@@ -14,8 +14,8 @@ source /usr/local/include/pihole/piholeInclude
 
 rerun_pihole "$0" "$@"
 
-adListFile=/etc/pihole/adlists.list
-adListDefault=/etc/pihole/adlists.default
+adListFile="${piholeConfigDir}/adlists.list"
+adListDefault="${piholeConfigDir}/adlists.default"
 whitelistScript=/usr/local/bin/whitelist.sh
 blacklistScript=/usr/local/bin/blacklist.sh
 
@@ -206,7 +206,7 @@ function gravity_Blacklist(){
 	echo -n "::: Running blacklist script to update HOSTS file...."
 	$blacklistScript -f -nr -q > /dev/null & spinner $!
 	
-	numBlacklisted=$(wc -l < "/etc/pihole/blacklist.txt")
+	numBlacklisted=$(wc -l < "${piholeConfigDir}/blacklist.txt")
 	plural=; [[ "$numBlacklisted" != "1" ]] && plural=s
   echo " $numBlacklisted domain${plural} blacklisted!"
   
@@ -231,7 +231,7 @@ function gravity_Whitelist() {
 	echo -n "::: Running whitelist script to update HOSTS file...."
 	$whitelistScript -f -nr -q ${urls[@]} > /dev/null & spinner $!
 		
-	numWhitelisted=$(wc -l < "/etc/pihole/whitelist.txt")
+	numWhitelisted=$(wc -l < "${piholeConfigDir}/whitelist.txt")
 	plural=; [[ "$numWhitelisted" != "1" ]] && plural=s
   echo " $numWhitelisted domain${plural} whitelisted!"
   
@@ -263,7 +263,7 @@ function gravity_hostFormat() {
     echo -e "$piholeIP Pi-Hole.IsWorking.OK" > $piholeDir/$accretionDisc
     cat $piholeDir/$eventHorizon | awk -v ipv4addr="$piholeIP" '{sub(/\r$/,""); print ipv4addr" "$0}' >> $piholeDir/$accretionDisc
   fi
-	# Copy the file over as /etc/pihole/gravity.list so dnsmasq can use it
+	# Copy the file over as ${piholeConfigDir}/gravity.list so dnsmasq can use it
 	cp $piholeDir/$accretionDisc $adList
 }
 
@@ -303,7 +303,7 @@ function gravity_reload() {
 	#Clear no longer needed files...
 	echo ":::"
 	echo -n "::: Cleaning up un-needed files..."
-	rm /etc/pihole/pihole.*
+	rm "${piholeConfigDir}/pihole.*"
 	echo " done!"
 	
 	# Reload hosts file
@@ -318,7 +318,7 @@ function gravity_reload() {
 	echo " done!"
 }
 
-cp /etc/.pihole/adlists.default /etc/pihole/adlists.default
+cp /etc/.pihole/adlists.default "${piholeConfigDir}/adlists.default"
 gravity_collapse
 gravity_spinup
 gravity_Schwarzchild

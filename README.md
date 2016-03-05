@@ -15,6 +15,8 @@ Branches beginning "alt/" are largely internal to the fork.  Other branches are 
 
 ## Unbranched changes in alt/master
 
-- Removed "chmod 777 hack"
+- Removed "chmod 777 hack".
 - Moved several variables to a config file.
-- Split variable files out of /etc/pihole to /var/lib/pihole
+- Moved a few functions into an include file.
+- Split variable files out of /etc/pihole to /var/lib/pihole.
+- Can set up an apache vhost (IF it is already installed).

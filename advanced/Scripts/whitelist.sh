@@ -134,7 +134,7 @@ function ModifyHostFile(){
         awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIP $line"; done > "${piholeConfigDir}/whitelist.tmp"
         awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIPv6 $line"; done >> "${piholeConfigDir}/whitelist.tmp"
         echo "l" >> "${piholeConfigDir}/whitelist.tmp"
-        grep -F -x -v -f "${piholeConfigDir}/whitelist.tmp" "${piholeConfigDir}/gravity.list" > "${piholeConfigDir}/gravity.tmp     "   
+        grep -F -x -v -f "${piholeConfigDir}/whitelist.tmp" "${piholeConfigDir}/gravity.list" > "${piholeConfigDir}/gravity.tmp"
         rm "${piholeConfigDir}/gravity.list"
         mv "${piholeConfigDir}/gravity.tmp" "${piholeConfigDir}/gravity.list"
         rm "${piholeConfigDir}/whitelist.tmp"

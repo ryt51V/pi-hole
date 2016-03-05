@@ -136,12 +136,7 @@ function gravity_collapse() {
         mkdir $piholeDir & spinner $!
         echo " done!"
 	fi
-	# Still not the best, but slightly more elegent hack than chmod 777.
-	# Run script to give the pihole group permissions to the pihole directory.
-	# This requires root.
-	# The installer should have created a file in sudoers.d to allow pihole user
-	# to run piholeSetPermissions.sh as root with sudo without a password
-	sudo --non-interactive /usr/local/bin/piholeSetPermissions.sh
+
 }
 
 # patternCheck - check to see if curl downloaded any new files.

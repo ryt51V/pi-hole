@@ -580,10 +580,9 @@ installScripts() {
 	cp /etc/.pihole/advanced/Scripts/whitelist.sh /usr/local/bin/whitelist.sh
 	cp /etc/.pihole/advanced/Scripts/blacklist.sh /usr/local/bin/blacklist.sh
 	cp /etc/.pihole/advanced/Scripts/piholeReloadServices.sh /usr/local/bin/piholeReloadServices.sh
-	cp /etc/.pihole/advanced/Scripts/piholeSetPermissions.sh /usr/local/bin/piholeSetPermissions.sh
 	cp /etc/.pihole/advanced/Scripts/piholeLogFlush.sh /usr/local/bin/piholeLogFlush.sh
 	cp /etc/.pihole/advanced/Scripts/updateDashboard.sh /usr/local/bin/updateDashboard.sh
-	chmod 755 /usr/local/bin/{gravity,chronometer,whitelist,blacklist,piholeReloadServices,piholeSetPermissions,piholeLogFlush,updateDashboard}.sh
+	chmod 755 /usr/local/bin/{gravity,chronometer,whitelist,blacklist,piholeReloadServices,piholeLogFlush,updateDashboard}.sh
 	
 	mkdir -p /usr/local/include/pihole
 	cp /etc/.pihole/advanced/Scripts/piholeInclude /usr/local/include/pihole/piholeInclude
@@ -829,7 +828,7 @@ installSudoersFile() {
 	# Install the file in /etc/sudoers.d that defines what commands
 	# and scripts the pihole user can elevate to root with sudo.
 	sudoersFile='/etc/sudoers.d/pihole'
-	sudoersContent="pihole	ALL=(ALL:ALL) NOPASSWD: /usr/local/bin/piholeReloadServices.sh, /usr/local/bin/piholeSetPermissions.sh"
+	sudoersContent="pihole	ALL=(ALL:ALL) NOPASSWD: /usr/local/bin/piholeReloadServices.sh"
 	echo "$sudoersContent" > "$sudoersFile"
 	# chmod as per /etc/sudoers.d/README
 	chmod 0440 "$sudoersFile"

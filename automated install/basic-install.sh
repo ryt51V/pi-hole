@@ -62,6 +62,8 @@ r=0
 c=0
 
 piholeconffile="${piholeConfigDir}/pihole.conf"
+# IPv6 file is now only used for the admin interface PHP to know if IPv6 is enabled
+piholeIPv6file="${piholeConfigDir}/.useIPv6"
 
 availableInterfaces=$(ip -o link | awk '{print $2}' | grep -v "lo" | cut -d':' -f1)
 dhcpcdFile=/etc/dhcpcd.conf
@@ -108,8 +110,21 @@ cat << EOF
 webServer=$webServer
 piholeInterface=$piholeInterface
 IPv4addr=${IPv4addr%/*}
+# Note that the .useIPv6 file in this folder is used for the admin interface to detect whether IPv6 is enabled or not.
 useIPv6=$useIPv6
 EOF
+}
+
+writeConfig() {
+	generateConfig > "$piholeconffile"
+	
+	# The admin interface still looks for the .useIPv6 file to know whether or not it's enabled.
+	if [[ $useIPv6 ]]
+	then
+		touch /etc/pihole/.useIPv6
+	else
+		rm -f "${piholeIPv6file}"
+	fi
 }
 
 backupLegacyPihole() {
@@ -917,7 +932,7 @@ backupLegacyPihole
 setPassword
 
 # Save the configuration to a file
-generateConfig > "$piholeconffile"
+writeConfig
 
 # Install and log everything to a file
 installPihole | tee $tmpLog

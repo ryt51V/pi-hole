@@ -15,6 +15,11 @@
 # explicitly set the $SUDO variable to an empty string.
 SUDO=""
 
+# Include the pihole config file
+piholeconffile=/etc/pihole/pihole.conf
+source "$piholeconffile"
+
+# Functions to rerun script with sudo
 function rerun_root() {
 	# Check if root, and if not then rerun with sudo.
 	# The parent script should pass its $0 and $@ to this function.

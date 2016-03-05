@@ -37,33 +37,11 @@ versbose=true
 domList=()
 domToRemoveList=()
 
-piholeINTfile=/etc/pihole/piholeINT
-piholeIPfile=/etc/pihole/piholeIP
-piholeIPv6file=/etc/pihole/.useIPv6
-
 echo ":::"
 
-# Know which interface we are using.
-if [[ -f $piholeINTfile ]]; then
-    # This file should normally exist - it was saved as part of the install.
-    IPv4dev=$(cat $piholeINTfile)
-else
-    # If it doesn't, we err on the side of working with the majority of setups and detect the most likely interface.
-    echo "::: Warning: ${piholeINTfile} is missing.  Auto detecting interface."
-    IPv4dev=$(ip route get 8.8.8.8 | awk '{for(i=1;i<=NF;i++)if($i~/dev/)print $(i+1)}')
-fi
-
-# Know which IPv4 address we are using.
-if [[ -f $piholeIPfile ]];then
-    # This file should normally exist - it was saved as part of the install.
-    piholeIP=$(cat $piholeIPfile)
-else
-    # If it doesn't, we err on the side of working with the majority of setups and detect the most likely IPv4 address,
-    # which is the first one we find belonging to the given interface.
-    echo "::: Warning: ${piholeIPfile} is missing.  Auto detecting IP address."
-    piholeIPCIDR=$(ip -o -f inet addr show dev $IPv4dev | awk '{print $4}' | head -n 1)
-    piholeIP=${piholeIPCIDR%/*}
-fi
+# Set variables from those imported from pihole.conf
+IPv4dev=$piholeInterface
+piholeIP=$IPv4addr
 
 echo "::: Large gravitational pull detected at ${piholeIP} (${IPv4dev})."
 echo ":::"
@@ -71,7 +49,7 @@ echo ":::"
 modifyHost=false
 
 
-if [[ -f $piholeIPv6file ]];then
+if [[ $useIPv6 ]];then
     # If the file exists, then the user previously chose to use IPv6 in the automated installer
     piholeIPv6=$(ip -6 route get 2001:4860:4860::8888 | awk -F " " '{ for(i=1;i<=NF;i++) if ($i == "src") print $(i+1) }')
 fi

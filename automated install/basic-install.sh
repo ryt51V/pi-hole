@@ -58,9 +58,7 @@ columns=$(tput cols)
 r=0
 c=0
 
-piholeINTfile=/etc/pihole/piholeINT
-piholeIPfile=/etc/pihole/piholeIP
-piholeIPv6file=/etc/pihole/.useIPv6
+piholeconffile=/etc/pihole/pihole.conf
 
 availableInterfaces=$(ip -o link | awk '{print $2}' | grep -v "lo" | cut -d':' -f1)
 dhcpcdFile=/etc/dhcpcd.conf
@@ -95,6 +93,15 @@ mkpiholeDir() {
 	mkdir -p /etc/pihole/
 	chown --recursive root:pihole /etc/pihole
 	chmod --recursive ug=rwX,o=rX /etc/pihole
+}
+
+generateConfig() {
+cat << EOF
+webServer=$WebServer
+piholeInterface=$piholeInterface
+IPv4addr=${IPv4addr%/*}
+useIPv6=$useIPv6
+EOF
 }
 
 backupLegacyPihole() {
@@ -175,13 +182,6 @@ chooseInterface() {
 	
 }
 
-cleanupIPv6() {
-	# Removes IPv6 indicator file if we are not using IPv6
-	if [ -f "/etc/pihole/.useIPv6" ] && [ ! $useIPv6 ]; then
-		rm /etc/pihole/.useIPv6
-	fi
-}
-
 use4andor6() {
 	# Let use select IPv4 and/or IPv6
 	cmd=(whiptail --separate-output --checklist "Select Protocols\n\n(If you are unsure, leave these as the defaults.)" $r $c 2)
@@ -233,9 +233,6 @@ use4andor6() {
 										Gateway:         $IPv4gw" $r $c)
 			then
 				echo "::: Leaving IPv4 settings as is."
-				# Saving the IP and interface to a file for future use by other scripts (gravity.sh, whitelist.sh, etc.)
-				echo ${IPv4addr%/*} > "${piholeIPfile}"
-				echo $piholeInterface > "${piholeINTfile}"
 			else
 				getStaticIPv4Settings
 				setStaticIPv4
@@ -257,7 +254,7 @@ use4andor6() {
 			echo "::: Exiting"
 			exit 1
 		fi
-		cleanupIPv6
+	
 	else
 		echo "::: Cancel selected. Exiting..."
 		exit 1
@@ -268,8 +265,6 @@ useIPv6dialog() {
 	# Show the IPv6 address used for blocking
 	piholeIPv6=$(ip -6 route get 2001:4860:4860::8888 | awk -F " " '{ for(i=1;i<=NF;i++) if ($i == "src") print $(i+1) }')
 	whiptail --msgbox --backtitle "IPv6..." --title "IPv6 Supported" "$piholeIPv6 will be used to block ads." $r $c
-
-	touch /etc/pihole/.useIPv6
 }
 
 getStaticIPv4Settings() {
@@ -301,9 +296,6 @@ getStaticIPv4Settings() {
 							IP address:    $IPv4addr
 							Gateway:       $IPv4gw" $r $c)then
 							# If the settings are correct, then we need to set the piholeIP
-							# Saving the IP and interface to a file for future use by other scripts (gravity.sh, whitelist.sh, etc.)
-							echo ${IPv4addr%/*} > "${piholeIPfile}"
-							echo $piholeInterface > "${piholeINTfile}"
 							# After that's done, the loop ends and we move on
 							ipSettingsCorrect=True
 					else
@@ -910,6 +902,9 @@ setDNS
 
 # Set the admin page password
 setPassword
+
+# Save the configuration to a file
+generateConfig > "$piholeconffile"
 
 # Install and log everything to a file
 installPihole | tee $tmpLog

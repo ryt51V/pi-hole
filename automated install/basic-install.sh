@@ -97,7 +97,7 @@ mkpiholeDir() {
 
 generateConfig() {
 cat << EOF
-webServer=$WebServer
+webServer=$webServer
 piholeInterface=$piholeInterface
 IPv4addr=${IPv4addr%/*}
 useIPv6=$useIPv6

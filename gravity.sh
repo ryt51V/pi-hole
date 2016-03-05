@@ -38,11 +38,10 @@ fi
 
 # Variables for various stages of downloading and formatting the list
 basename=pihole
-piholeDir=/etc/$basename
-adList=$piholeDir/gravity.list
-blacklist=$piholeDir/blacklist.txt
-whitelist=$piholeDir/whitelist.txt
-latentWhitelist=$piholeDir/latentWhitelist.txt
+adList=${piholeVarDir}/gravity.list
+blacklist=${piholeConfigDir}/blacklist.txt
+whitelist=${piholeConfigDir}/whitelist.txt
+latentWhitelist=${piholeConfigDir}/latentWhitelist.txt
 justDomainsExtension=domains
 matterandlight=$basename.0.matterandlight.txt
 supernova=$basename.1.supernova.txt
@@ -86,11 +85,11 @@ function gravity_collapse() {
 	fi	
 
 	# Create the pihole resource directory if it doesn't exist.  Future files will be stored here
-	if [[ -d $piholeDir ]];then
+	if [[ -d ${piholeConfigDir} ]];then
         echo "."
 	else
         echo -n "::: Creating pihole directory..."
-        mkdir $piholeDir & spinner $!
+        mkdir ${piholeConfigDir} & spinner $!
         echo " done!"
 	fi
 
@@ -146,7 +145,7 @@ function gravity_spinup() {
         domain=$(echo "$url" | cut -d'/' -f3)
 
         # Save the file as list.#.domain
-        saveLocation=$piholeDir/list.$i.$domain.$justDomainsExtension
+        saveLocation=${piholeVarDir}/list.$i.$domain.$justDomainsExtension
         activeDomains[$i]=$saveLocation
 
         agent="Mozilla/10.0"
@@ -177,10 +176,10 @@ function gravity_Schwarzchild() {
   echo "::: "
 	# Find all active domains and compile them into one file and remove CRs
 	echo -n "::: Aggregating list of domains..."
-	truncate -s 0 $piholeDir/$matterandlight & spinner $! 
+	truncate -s 0 ${piholeVarDir}/$matterandlight & spinner $! 
 	for i in "${activeDomains[@]}"
 	do
-   		cat $i |tr -d '\r' >> $piholeDir/$matterandlight
+   		cat $i |tr -d '\r' >> ${piholeVarDir}/$matterandlight
 	done
 	echo " done!"
 	
@@ -228,9 +227,9 @@ function gravity_Whitelist() {
 function gravity_unique() {
 	# Sort and remove duplicates
 	echo -n "::: Removing duplicate domains...."
-	sort -u  $piholeDir/$supernova > $piholeDir/$eventHorizon  & spinner $!
+	sort -u  ${piholeVarDir}/$supernova > ${piholeVarDir}/$eventHorizon  & spinner $!
 	echo " done!"
-	numberOf=$(wc -l < $piholeDir/$eventHorizon)
+	numberOf=$(wc -l < ${piholeVarDir}/$eventHorizon)
 	echo "::: $numberOf unique domains trapped in the event horizon."
 }
 
@@ -240,23 +239,23 @@ function gravity_hostFormat() {
   # If there is a value in the $piholeIPv6, then IPv6 will be used, so the awk command modified to create a line for both protocols
   if [[ -n $piholeIPv6 ]];then
   	#Add dummy domain Pi-Hole.IsWorking.OK to the top of gravity.list to make ping result return a friendlier looking domain!
-    echo -e "$piholeIP Pi-Hole.IsWorking.OK \n$piholeIPv6 Pi-Hole.IsWorking.OK" > $piholeDir/$accretionDisc
-    cat $piholeDir/$eventHorizon | awk -v ipv4addr="$piholeIP" -v ipv6addr="$piholeIPv6" '{sub(/\r$/,""); print ipv4addr" "$0"\n"ipv6addr" "$0}' >> $piholeDir/$accretionDisc
+    echo -e "$piholeIP Pi-Hole.IsWorking.OK \n$piholeIPv6 Pi-Hole.IsWorking.OK" > ${piholeVarDir}/$accretionDisc
+    cat ${piholeVarDir}/$eventHorizon | awk -v ipv4addr="$piholeIP" -v ipv6addr="$piholeIPv6" '{sub(/\r$/,""); print ipv4addr" "$0"\n"ipv6addr" "$0}' >> ${piholeVarDir}/$accretionDisc
     
   else
       # Otherwise, just create gravity.list as normal using IPv4
       #Add dummy domain Pi-Hole.IsWorking.OK to the top of gravity.list to make ping result return a friendlier looking domain!
-    echo -e "$piholeIP Pi-Hole.IsWorking.OK" > $piholeDir/$accretionDisc
-    cat $piholeDir/$eventHorizon | awk -v ipv4addr="$piholeIP" '{sub(/\r$/,""); print ipv4addr" "$0}' >> $piholeDir/$accretionDisc
+    echo -e "$piholeIP Pi-Hole.IsWorking.OK" > ${piholeVarDir}/$accretionDisc
+    cat ${piholeVarDir}/$eventHorizon | awk -v ipv4addr="$piholeIP" '{sub(/\r$/,""); print ipv4addr" "$0}' >> ${piholeVarDir}/$accretionDisc
   fi
-	# Copy the file over as ${piholeConfigDir}/gravity.list so dnsmasq can use it
-	cp $piholeDir/$accretionDisc $adList
+	# Copy the file over as ${piholeVarDir}/gravity.list so dnsmasq can use it
+	cp ${piholeVarDir}/$accretionDisc $adList
 }
 
 # blackbody - remove any remnant files from script processes
 function gravity_blackbody() {
 	# Loop through list files
-	for file in $piholeDir/*.$justDomainsExtension
+	for file in ${piholeVarDir}/*.$justDomainsExtension
 	do
 		# If list is in active array then leave it (noop) else rm the list
 		if [[ " ${activeDomains[@]} " =~ " ${file} " ]]; then
@@ -275,10 +274,10 @@ function gravity_advanced() {
 	# This helps with that and makes it easier to read
 	# It also helps with debugging so each stage of the script can be researched more in depth
 	echo -n "::: Formatting list of domains to remove comments...."
-	awk '($1 !~ /^#/) { if (NF>1) {print $2} else {print $1}}' $piholeDir/$matterandlight | sed -nr -e 's/\.{2,}/./g' -e '/\./p' >  $piholeDir/$supernova & spinner $!
+	awk '($1 !~ /^#/) { if (NF>1) {print $2} else {print $1}}' ${piholeVarDir}/$matterandlight | sed -nr -e 's/\.{2,}/./g' -e '/\./p' >  ${piholeVarDir}/$supernova & spinner $!
   echo " done!"
   
-	numberOf=$(wc -l < $piholeDir/$supernova)
+	numberOf=$(wc -l < ${piholeVarDir}/$supernova)
 	echo "::: $numberOf domains being pulled in by gravity..."
     
 	gravity_unique
@@ -289,7 +288,7 @@ function gravity_reload() {
 	#Clear no longer needed files...
 	echo ":::"
 	echo -n "::: Cleaning up un-needed files..."
-	rm "${piholeConfigDir}"/pihole.*
+	rm "${piholeVarDir}"/pihole.*
 	echo " done!"
 	
 	# Reload hosts file

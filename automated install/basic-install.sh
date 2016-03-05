@@ -530,7 +530,7 @@ versionCheckDNSmasq(){
   # Check if /etc/dnsmasq.conf is from pihole.  If so replace with an original and install new in .d directory
   dnsFile1="/etc/dnsmasq.conf"
   dnsFile2="/etc/dnsmasq.conf.orig"
-  dnsSearch="addn-hosts=${piholeConfigDir}/gravity.list"
+  dnsSearch="addn-hosts=${piholeVarDir}/gravity.list"
   
   defaultFile="/etc/.pihole/advanced/dnsmasq.conf.original"
   newFileToInstall="/etc/.pihole/advanced/01-pihole.conf"
@@ -802,9 +802,9 @@ runGravity() {
 	# Rub gravity.sh to build blacklists
 	echo ":::"
 	echo "::: Preparing to run gravity.sh to refresh hosts..."	
-	if ls "${piholeConfigDir}"/list* 1> /dev/null 2>&1; then
+	if ls "${piholeVarDir}"/list* 1> /dev/null 2>&1; then
 		echo "::: Cleaning up previous install (preserving whitelist/blacklist)"		
-		rm "${piholeConfigDir}"/list.*
+		rm "${piholeVarDir}"/list.*
 	fi
 	#Don't run as SUDO, this was causing issues
 	echo "::: Running gravity.sh"
@@ -852,7 +852,6 @@ installPihole() {
 	checkForDependencies # done
 	stopServices
 	setUser
-	mkdir -p "${piholeConfigDir}"
 	if [[ ! ( -d "$webRoot") ]]
 	then
 		mkdir -p "${webRoot}/pihole"

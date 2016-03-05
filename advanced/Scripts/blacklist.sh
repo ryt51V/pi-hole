@@ -29,7 +29,7 @@ rerun_pihole "$0" "$@"
 
 #globals
 blacklist="${piholeConfigDir}/blacklist.txt"
-adList="${piholeConfigDir}/gravity.list"
+adList="${piholeVarDir}/gravity.list"
 reload=true
 addmode=true
 force=false

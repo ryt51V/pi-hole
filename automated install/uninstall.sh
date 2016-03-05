@@ -34,7 +34,7 @@ fi
 
 ######## VARIABLES #########
 
-piholeConfigDir=/etc/pihole/
+piholeConfigDir=/etc/pihole
 piholeVarDir=/var/lib/pihole
 
 ######### SCRIPT ###########

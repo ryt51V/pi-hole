@@ -29,7 +29,7 @@ rerun_pihole "$0" "$@"
 
 #globals
 whitelist="${piholeConfigDir}/whitelist.txt"
-adList="${piholeConfigDir}/gravity.list"
+adList="${piholeVarDir}/gravity.list"
 reload=true
 addmode=true
 force=false
@@ -131,13 +131,13 @@ function ModifyHostFile(){
         plural=; [[ "$numberOf" != "1" ]] && plural=s
         echo ":::"
         echo -n "::: Modifying HOSTS file to whitelist $numberOf domain${plural}..."
-        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIP $line"; done > "${piholeConfigDir}/whitelist.tmp"
-        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIPv6 $line"; done >> "${piholeConfigDir}/whitelist.tmp"
-        echo "l" >> "${piholeConfigDir}/whitelist.tmp"
-        grep -F -x -v -f "${piholeConfigDir}/whitelist.tmp" "${piholeConfigDir}/gravity.list" > "${piholeConfigDir}/gravity.tmp"
-        rm "${piholeConfigDir}/gravity.list"
-        mv "${piholeConfigDir}/gravity.tmp" "${piholeConfigDir}/gravity.list"
-        rm "${piholeConfigDir}/whitelist.tmp"
+        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIP $line"; done > "${piholeVarDir}/whitelist.tmp"
+        awk -F':' '{print $1}' $whitelist | while read line; do echo "$piholeIPv6 $line"; done >> "${piholeVarDir}/whitelist.tmp"
+        echo "l" >> "${piholeVarDir}/whitelist.tmp"
+        grep -F -x -v -f "${piholeVarDir}/whitelist.tmp" "${piholeVarDir}/gravity.list" > "${piholeVarDir}/gravity.tmp"
+        rm "${piholeVarDir}/gravity.list"
+        mv "${piholeVarDir}/gravity.tmp" "${piholeVarDir}/gravity.list"
+        rm "${piholeVarDir}/whitelist.tmp"
         echo " done!"
 	  	  
 	  	fi

@@ -47,7 +47,7 @@ piholeVarDir=/var/lib/pihole
 tmpLog=/tmp/pihole-install.log
 instalLogLoc="${piholeConfigDir}/install.log"
 
-webInterfaceGitUrl="https://github.com/pi-hole/AdminLTE.git"
+webInterfaceGitUrl="https://github.com/ryt51V/AdminLTE-alt"
 
 piholeGitUrl="https://github.com/ryt51V/pi-hole-alt"
 piholeFilesDir="/etc/.pihole"

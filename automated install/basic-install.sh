@@ -802,9 +802,9 @@ runGravity() {
 	# Rub gravity.sh to build blacklists
 	echo ":::"
 	echo "::: Preparing to run gravity.sh to refresh hosts..."	
-	if ls "${piholeConfigDir}/list*" 1> /dev/null 2>&1; then
+	if ls "${piholeConfigDir}"/list* 1> /dev/null 2>&1; then
 		echo "::: Cleaning up previous install (preserving whitelist/blacklist)"		
-		rm "${piholeConfigDir}/list.*"
+		rm "${piholeConfigDir}"/list.*
 	fi
 	#Don't run as SUDO, this was causing issues
 	echo "::: Running gravity.sh"

@@ -303,7 +303,7 @@ function gravity_reload() {
 	#Clear no longer needed files...
 	echo ":::"
 	echo -n "::: Cleaning up un-needed files..."
-	rm "${piholeConfigDir}/pihole.*"
+	rm "${piholeConfigDir}"/pihole.*
 	echo " done!"
 	
 	# Reload hosts file

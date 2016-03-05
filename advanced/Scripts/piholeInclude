@@ -12,6 +12,10 @@
 
 ######## VARIABLES #########
 
+# Note that these directories are also referenced in
+# 	01-pihole.conf		dnsmasq conf
+# 	data.php			in AdminLTE
+# And would need to be updated manually there in the event of any change here.
 piholeConfigDir=/etc/pihole
 piholeVarDir=/var/lib/pihole
 

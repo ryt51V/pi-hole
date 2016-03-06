@@ -10,47 +10,45 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 
-# Check if root, and if not then rerun with sudo.
-echo ":::"
-if [[ $EUID -eq 0 ]];then
-	echo "::: You are root."
-	# Older versions of Pi-hole set $SUDO="sudo" and prefixed commands with it,
-	# rather than rerunning as sudo. Just in case it turns up by accident, 
-	# explicitly set the $SUDO variable to an empty string.
-	SUDO=""
-else
-	echo "::: sudo will be used."
-	# Check if it is actually installed
-	# If it isn't, exit because the install cannot complete
-	if [[ $(dpkg-query -s sudo) ]];then
-		echo "::: Running sudo $0 $@"
-		sudo "$0" "$@"
-		exit $?
-	else
-		echo "::: Please install sudo or run this script as root."
+source /usr/local/include/pihole/piholeInclude
+
+if [[ $? != 0 ]]; then
+	echo "::: Error including /usr/local/include/pihole/piholeInclude.  Unable to continue with uninstall."
 	exit 1
-	fi
 fi
 
-######## VARIABLES #########
-
-piholeConfigDir=/etc/pihole
-piholeVarDir=/var/lib/pihole
+rerun_root "$0" "$@"
 
 ######### SCRIPT ###########
 apt-get -y remove --purge dnsutils bc toilet
 apt-get -y remove --purge dnsmasq
-apt-get -y remove --purge lighttpd php5-common php5-cgi php5
+apt-get -y remove --purge php5-common php5-cgi php5
+
+
+
+case $webServer in
+	lighttpd)
+		apt-get -y remove --purge lighttpd
+		rm "${webRoot}/index.lighttpd.orig"
+		rm -rf /etc/lighttpd/
+		;;
+	apache)
+		:
+		;;
+	Manual)
+		:
+		;;
+esac
 
 # Only web directories/files that are created by pihole should be removed.
 echo "Removing the Pi-hole Web server files..."
-rm -rf /var/www/html/admin
-rm -rf /var/www/html/pihole
-rm /var/www/html/index.lighttpd.orig
+rm -rf "${webRoot}/admin"
+rm -rf "${webRoot}/pihole"
 
 # If the web directory is empty after removing these files, then the parent html folder can be removed.
-if [[ ! "$(ls -A /var/www/html)" ]]; then
-    rm -rf /var/www/html
+webRootFiles=$(ls -A "${webRoot}")
+if [[ ! "$webRootFiles" ]]; then
+    rm -rf "${webRoot}"
 fi
 
 echo "Removing dnsmasq config files..."
@@ -76,7 +74,6 @@ fi
 echo "Removing config files and scripts..."
 rm /etc/dnsmasq.conf
 rm /etc/sudoers.d/pihole
-rm -rf /etc/lighttpd/
 rm /var/log/pihole.log
 rm /usr/local/bin/gravity.sh
 rm /usr/local/bin/chronometer.sh

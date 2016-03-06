@@ -107,12 +107,17 @@ mkpiholeDir() {
 
 generateConfig() {
 cat << EOF
-webServer=$webServer
-webRoot=$webRoot
+#### Repo #####
+webInterfaceGitUrl=$webInterfaceGitUrl
+piholeGitUrl=$piholeGitUrl
+#### Network ####
 piholeInterface=$piholeInterface
 IPv4addr=${IPv4addr%/*}
 # Note that the .useIPv6 file in this folder is used for the admin interface to detect whether IPv6 is enabled or not.
 useIPv6=$useIPv6
+#### Web Server ####
+webServer=$webServer
+webRoot=$webRoot
 EOF
 }
 

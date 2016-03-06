@@ -14,7 +14,7 @@ source /usr/local/include/pihole/piholeInclude
 
 rerun_pihole "$0" "$@"
 
-WEB_INTERFACE_GIT_URL="https://github.com/pi-hole/AdminLTE.git"
+WEB_INTERFACE_GIT_URL="${webInterfaceGitUrl}"
 WEB_INTERFACE_DIR="${webRoot}/admin"
 
 main() {

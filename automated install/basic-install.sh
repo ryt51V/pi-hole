@@ -117,7 +117,8 @@ IPv4addr=${IPv4addr%/*}
 useIPv6=$useIPv6
 #### Web Server ####
 webServer=$webServer
-webRoot=$webRoot
+webRootPihole=$webRootPihole
+webRootAdmin=$webRootAdmin
 EOF
 }
 
@@ -384,7 +385,8 @@ function chooseWebServer() {
 	case $webServer in
 		lighttpd)
 			echo "::: Using lighttpd web server."
-			webRoot="/var/www/html"
+			webRootPihole="/var/www/html"
+			webRootAdmin="/var/www/html"
 			;;
 		apache)
 			echo "::: Using apache web server."
@@ -399,14 +401,18 @@ function chooseWebServer() {
 				fi
 			fi
 			
-			webRoot=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
+			webRootPihole=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
+			
+			webRootAdmin=$(whiptail --backtitle "apache" --title "Web Root" --inputbox "Enter the desired webroot for the Pi-hole Admin." $r $c "/var/www/pihole-admin" 3>&1 1>&2 2>&3)
 			;;
 		Manual)
 			echo "::: Using manual web server configuration."
-			webRoot=$(whiptail --backtitle "Web Root" --title "Web Root" --inputbox "Enter the root path of the website you have manually configured for Pi-hole." $r $c "/var/www/html" 3>&1 1>&2 2>&3)
+			webRoot=$(whiptail --backtitle "Web Root" --title "Web Root" --inputbox "Enter the root path of the website you have manually configured for Pi-hole." $r $c "/var/www/pihole" 3>&1 1>&2 2>&3)
+			
+			webRoot=$(whiptail --backtitle "Web Root" --title "Web Root" --inputbox "Enter the root path of the website you have manually configured for Pi-holeAdmin." $r $c "/var/www/pihole-admin" 3>&1 1>&2 2>&3)
 			;;
 	esac
-	webInterfaceDir="${webRoot}/admin"
+	webInterfaceDir="${webRootAdmin}/admin"
 }
 
 function valid_ip()
@@ -622,11 +628,17 @@ installConfigs() {
 			cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
 			;;
 		apache)
-			apachevhost='/etc/apache2/sites-available/pihole.conf'
-			cp /etc/.pihole/advanced/apache/pihole.conf "$apachevhost"
+			piholevhost='/etc/apache2/sites-available/pihole.conf'
+			cp /etc/.pihole/advanced/apache/pihole.conf "$piholevhost"
 			# sed separated by a character least likely to appear in the strings
-			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "$apachevhost"
-			sed -i "s#@webRoot@#$webRoot#" "$apachevhost"
+			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "$piholevhost"
+			sed -i "s#@webRoot@#$webRootPihole#" "$piholevhost"
+			
+			adminvhost='/etc/apache2/sites-available/pihole-admin.conf'
+			cp /etc/.pihole/advanced/apache/pihole-admin.conf "$adminvhost"
+			# sed separated by a character least likely to appear in the strings
+			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "$adminvhost"
+			sed -i "s#@webRoot@#$webRootAdmin#" "$adminvhost"
 			;;
 		Manual)
 			:
@@ -776,13 +788,13 @@ installPiholeWeb() {
 	# Install the web interface
 	echo ":::"
 	echo -n "::: Installing pihole custom index page..."
-	if [ -d "${webRoot}/pihole" ]; then
+	if [ -d "${webRootPihole}/pihole" ]; then
 		echo " Existing page detected, not overwriting"
 	else
-		mkdir "${webRoot}/pihole"
+		mkdir "${webRootPihole}/pihole"
 		case $webServer in
 			lighttpd)
-				mv "${webRoot}/index.lighttpd.html" "${webRoot}/index.lighttpd.orig"
+				mv "${webRootPihole}/index.lighttpd.html" "${webRootPihole}/index.lighttpd.orig"
 				;;
 			apache)
 				:
@@ -791,7 +803,7 @@ installPiholeWeb() {
 				:
 				;;
 		esac
-		cp /etc/.pihole/advanced/index.html "${webRoot}/pihole/index.html"
+		cp /etc/.pihole/advanced/index.html "${webRootPihole}/pihole/index.html"
 		echo " done!"
 	fi
 	
@@ -873,12 +885,12 @@ installPihole() {
 	checkForDependencies # done
 	stopServices
 	setUser
-	if [[ ! ( -d "$webRoot") ]]
+	if [[ ! ( -d "$webRootPihole") ]]
 	then
-		mkdir -p "${webRoot}/pihole"
+		mkdir -p "${webRootPihole}/pihole"
 	fi
-	chown www-data:www-data "${webRoot}"
-	chmod 775 "${webRoot}"
+	chown www-data:www-data "${webRootPihole}"
+	chmod 775 "${webRootPihole}"
 	usermod -a -G www-data pihole
 	if [[ "$webServer" = "lighttpd" ]]
 	then

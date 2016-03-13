@@ -29,7 +29,7 @@ apt-get -y remove --purge php5-common php5-cgi php5
 case $webServer in
 	lighttpd)
 		apt-get -y remove --purge lighttpd
-		rm "${webRoot}/index.lighttpd.orig"
+		rm "${webRootPihole}/index.lighttpd.orig"
 		rm -rf /etc/lighttpd/
 		;;
 	apache)
@@ -42,13 +42,18 @@ esac
 
 # Only web directories/files that are created by pihole should be removed.
 echo "Removing the Pi-hole Web server files..."
-rm -rf "${webRoot}/admin"
-rm -rf "${webRoot}/pihole"
+rm -rf "${webRootPihole}/pihole"
 
 # If the web directory is empty after removing these files, then the parent html folder can be removed.
-webRootFiles=$(ls -A "${webRoot}")
+webRootFiles=$(ls -A "${webRootPihole}")
 if [[ ! "$webRootFiles" ]]; then
-    rm -rf "${webRoot}"
+    rm -rf "${webRootPihole}"
+fi
+
+rm -rf "${webRootAdmin}/admin"
+webRootFiles=$(ls -A "${webRootAdmin}")
+if [[ ! "$webRootFiles" ]]; then
+    rm -rf "${webRootAdmin}"
 fi
 
 echo "Removing dnsmasq config files..."

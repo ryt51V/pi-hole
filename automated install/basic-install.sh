@@ -386,7 +386,7 @@ function chooseWebServer() {
 		lighttpd)
 			echo "::: Using lighttpd web server."
 			webRootPihole="/var/www/html"
-			webRootAdmin="/var/www/html"
+			webRootAdmin="/var/www/pihole-admin"
 			;;
 		apache)
 			echo "::: Using apache web server."

@@ -624,8 +624,11 @@ installConfigs() {
 	
 	case $webServer in
 		lighttpd)
-			mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.orig
-			cp /etc/.pihole/advanced/lighttpd.conf /etc/lighttpd/lighttpd.conf
+			lighttpdconf='/etc/lighttpd/lighttpd.conf'
+			mv "${lighttpdconf}" /etc/lighttpd/lighttpd.conf.orig
+			cp /etc/.pihole/advanced/lighttpd.conf "${lighttpdconf}"
+			# sed separated by a character least likely to appear in the strings
+			sed -i "s#@IPv4addr@#${IPv4addr%/*}#" "${lighttpdconf}"
 			;;
 		apache)
 			piholevhost='/etc/apache2/sites-available/pihole.conf'

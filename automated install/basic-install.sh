@@ -815,6 +815,7 @@ installPiholeWeb() {
 			echo "::: Enabling apache site"
 			a2enmod headers rewrite
 			a2ensite pihole
+			a2ensite pihole-admin
 			;;
 		Manual)
 			:

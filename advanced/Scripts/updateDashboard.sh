@@ -61,7 +61,7 @@ make_repo() {
 update_repo() {
     # pull the latest commits
     cd "$WEB_INTERFACE_DIR"
-    git pull    
+    git pull
 }
 
 main

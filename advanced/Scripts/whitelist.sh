@@ -55,13 +55,13 @@ if [[ $useIPv6 ]];then
 fi
 
 
-function HandleOther(){	
+function HandleOther(){
   #check validity of domain
 	validDomain=$(echo $1 | perl -ne'print if /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/')
-	
+
 	if [ -z "$validDomain" ]; then
 		echo "::: $1 is not a valid argument or domain name"
-	else	  
+	else
 	  domList=("${domList[@]}" $validDomain)
 	fi
 }
@@ -70,9 +70,9 @@ function PopWhitelistFile(){
 	#check whitelist file exists, and if not, create it
 	if [[ ! -f $whitelist ]];then
   	  touch $whitelist
-	fi	
+	fi
 	for dom in "${domList[@]}"
-	do	  
+	do
 	  if $addmode; then
 	  	AddDomain $dom
 	  else
@@ -84,7 +84,7 @@ function PopWhitelistFile(){
 function AddDomain(){
 #| sed 's/\./\\./g'
 	bool=false
-	
+
 	grep -Ex -q "$1" $whitelist || bool=true
 	if $bool; then
 	  #domain not found in the whitelist file, add it!
@@ -104,7 +104,7 @@ function AddDomain(){
 }
 
 function RemoveDomain(){
-  
+
   bool=false
   grep -Ex -q "$1" $whitelist || bool=true
   if $bool; then
@@ -118,11 +118,11 @@ function RemoveDomain(){
     #echo "::: Un-whitelisting $dom..."
     #fi
     domToRemoveList=("${domToRemoveList[@]}" $1)
-    modifyHost=true	  	
-  fi  	
+    modifyHost=true
+  fi
 }
 
-function ModifyHostFile(){	
+function ModifyHostFile(){
 	 if $addmode; then
 	    #remove domains in  from hosts file
 	    if [[ -r $whitelist ]];then
@@ -139,14 +139,14 @@ function ModifyHostFile(){
         mv "${piholeVarDir}/gravity.tmp" "${piholeVarDir}/gravity.list"
         rm "${piholeVarDir}/whitelist.tmp"
         echo " done!"
-	  	  
+
 	  	fi
 	  else
 	    #we need to add the removed domains to the hosts file
 	    echo ":::"
 	    echo "::: Modifying HOSTS file to un-whitelist domains..."
 	    for rdom in "${domToRemoveList[@]}"
-	    do	      
+	    do
 	    	if [[ -n $piholeIPv6 ]];then
 	    	  echo -n ":::    Un-whitelisting $rdom on IPv4 and IPv6..."
 	    	  echo $rdom | awk -v ipv4addr="$piholeIP" -v ipv6addr="$piholeIPv6" '{sub(/\r$/,""); print ipv4addr" "$0"\n"ipv6addr" "$0}' >> $adList
@@ -160,7 +160,7 @@ function ModifyHostFile(){
 	      echo $rdom| sed 's/\./\\./g' | xargs -I {} perl -i -ne'print unless /'{}'(?!.)/;' $whitelist
 	      echo " done!"
 	    done
-	  fi	
+	  fi
 }
 
 function Reload() {
@@ -180,10 +180,10 @@ function Reload() {
 for var in "$@"
 do
   case "$var" in
-    "-nr"| "--noreload"  ) reload=false;;        			
+    "-nr"| "--noreload"  ) reload=false;;
     "-d" | "--delmode"   ) addmode=false;;
     "-f" | "--force"     ) force=true;;
-    "-q" | "--quiet"     ) versbose=false;;  			
+    "-q" | "--quiet"     ) versbose=false;;
     *                    ) HandleOther $var;;
   esac
 done

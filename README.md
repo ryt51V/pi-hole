@@ -15,8 +15,14 @@ Branches beginning "alt/" are largely internal to the fork.  Other branches are 
 
 ## Unbranched changes in alt/master
 
+### General
+
 - Removed "chmod 777 hack".
 - Moved several variables to a config file.
 - Moved a few functions into an include file.
 - Split variable files out of /etc/pihole to /var/lib/pihole.
+
+### Web Server
 - Can set up an apache vhost (IF it is already installed).
+- The admin interface is split into a separate host listening on port 8080.
+- The password asked during install is used to protect the admin interface at the web server level (lighttpd / apache).

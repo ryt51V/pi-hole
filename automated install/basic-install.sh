@@ -881,7 +881,7 @@ setPassword() {
 		whiptail --msgbox "The Pi-hole admin interface needs to be protected from unauthorised access.  You have chosen for Pi-Hole to install to a manually configured web server, so please make sure to configure authenticaiton, for example with a username and password." $r $c
 	else
 		
-		pass=$(whiptail --passwordbox "When accessing the Pi-hole admin interface, you will need to log on with the username 'pi-hole' and a password of your choosing.  \n\nPlease enter a password to secure your Pi-hole web interface." $r $c 3>&1 1>&2 2>&3)
+		pass=$(whiptail --passwordbox "When accessing the Pi-hole admin interface, you will need to log on with the username 'pi-hole' and a password of your choosing.  \n\nPlease enter a password to secure your Pi-hole web interface." 12 60 3>&1 1>&2 2>&3)
 
 		if [ $? = 0 ]; then
 			# Entered password
